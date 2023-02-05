@@ -1,38 +1,43 @@
 package goworker
 
 import (
-	"crypto/tls"
-	"crypto/x509"
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/url"
-	"time"
-
-	"github.com/gomodule/redigo/redis"
-	"vitess.io/vitess/go/pools"
+        "crypto/tls"
+        "crypto/x509"
+        "errors"
+        "fmt"
+        "io/ioutil"
+        "net/url"
+        "time"
+        "context"
+        "github.com/gomodule/redigo/redis"
+        "vitess.io/vitess/go/pools"
 )
 
 var (
-	errorInvalidScheme = errors.New("invalid Redis database URI scheme")
+        errorInvalidScheme = errors.New("invalid Redis database URI scheme")
 )
 
+
+func refreshCheck() (bool, error) {
+   return true, nil
+}
+
 type RedisConn struct {
-	redis.Conn
+        redis.Conn
 }
 
 func (r *RedisConn) Close() {
-	_ = r.Conn.Close()
+        _ = r.Conn.Close()
 }
 
 func newRedisFactory(uri string) pools.Factory {
-	return func() (pools.Resource, error) {
-		return redisConnFromURI(uri)
-	}
+        return func(ctx context.Context) (pools.Resource, error) {
+                return redisConnFromURI(uri)
+        }
 }
 
 func newRedisPool(uri string, capacity int, maxCapacity int, idleTimout time.Duration) *pools.ResourcePool {
-	return pools.NewResourcePool(newRedisFactory(uri), capacity, maxCapacity, idleTimout)
+        return pools.NewResourcePool(newRedisFactory(uri), capacity, maxCapacity, idleTimout, func(time.Time) {}, refreshCheck, time.Duration(0))
 }
 
 func redisConnFromURI(uriString string) (*RedisConn, error) {
