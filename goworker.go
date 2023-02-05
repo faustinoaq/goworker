@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/cihub/seelog"
-	"github.com/vitessio/vitess"
+	"vitess.io/vitess/go/pools"
 )
 
 var (
