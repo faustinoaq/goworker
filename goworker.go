@@ -68,6 +68,31 @@ func Init() error {
 	return nil
 }
 
+// Adding Missing methods from new API to make it compile
+// TODO: implement them
+
+func (c *RedisConn) ApplySetting(ctx context.Context, settings *pools.Setting) error {
+            // Apply the resource pool settings to the Redis connection
+                return nil
+        }
+
+func (c *RedisConn) IsSameSetting(setting string) bool {
+            // Apply the resource pool settings to the Redis connection
+                return true
+        }
+
+
+func (c *RedisConn) IsSettingApplied() bool {
+            // Apply the resource pool settings to the Redis connection
+                return true
+        }
+
+func (c *RedisConn) ResetSetting(ctx context.Context) error {
+            // Apply the resource pool settings to the Redis connection
+                return nil
+        }
+
+
 // GetConn returns a connection from the goworker Redis
 // connection pool. When using the pool, check in
 // connections as quickly as possible, because holding a
@@ -75,12 +100,19 @@ func Init() error {
 // while they wait for an available connection. Expect this
 // API to change drastically.
 func GetConn() (*RedisConn, error) {
-	resource, err := pool.Get(ctx)
 
-	if err != nil {
-		return nil, err
-	}
-	return resource.(*RedisConn), nil
+        // Setting represents a set query and reset query for system settings.
+        //Setting struct {
+        //      query      string
+        //      resetQuery string
+        //}
+        s := pools.NewSetting("", "")
+        resource, err := pool.Get(ctx, s)
+
+        if err != nil {
+                return nil, err
+        }
+        return resource.(*RedisConn), nil
 }
 
 // PutConn puts a connection back into the connection pool.
